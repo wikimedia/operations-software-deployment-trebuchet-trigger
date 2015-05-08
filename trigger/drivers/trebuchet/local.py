@@ -19,6 +19,8 @@ import trigger.drivers as drivers
 
 import redis
 
+import salt.version
+
 from datetime import datetime
 from trigger.drivers import SyncDriverError
 from trigger.drivers import LockDriverError
@@ -94,8 +96,17 @@ class SyncDriver(drivers.SyncDriver):
     def _checkout(self, args):
         # TODO (ryan-lane): Check return values from these commands
         repo_name = self.conf.config['deploy.repo-name']
+        if args.force:
+            # see https://github.com/saltstack/salt/issues/18317
+            _version_ = salt.version.SaltStackVersion(*salt.version.__version_info__)
+            if (_version_ >= "2014.7.3"):
+                runner_args = '[' + repo_name + ',' + str(args.force) + ']'
+            else:
+                runner_args = repo_name + ',' + str(args.force)
+        else:
+            runner_args = repo_name
         p = subprocess.Popen(['sudo','salt-call','-l','quiet','publish.runner',
-                              'deploy.checkout', repo_name+','+str(args.force)],
+                              'deploy.checkout', runner_args],
                              stdout=subprocess.PIPE)
         p.communicate()
 
@@ -206,9 +217,18 @@ class ServiceDriver(drivers.ServiceDriver):
 
     def restart(self, args):
         repo_name = self.conf.config['deploy.repo-name']
+        if args.batch:
+            # see https://github.com/saltstack/salt/issues/18317
+            _version_ = salt.version.SaltStackVersion(*salt.version.__version_info__)
+            if (_version_ >= "2014.7.3"):
+                runner_args = '[' + repo_name + ',' + str(args.batch) + ']'
+            else:
+                runner_args = repo_name +',' + str(args.batch)
+        else:
+           runner_args = repo_name
         p = subprocess.Popen(['sudo','salt-call','-l','quiet','--out=json',
                               'publish.runner','deploy.restart',
-                              repo_name+','+str(args.batch)],
+                              runner_args],
                              stdout=subprocess.PIPE)
         out = p.communicate()[0]
         ## Disabled until salt bug is fixed:

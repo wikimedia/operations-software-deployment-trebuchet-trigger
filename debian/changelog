@@ -1,3 +1,9 @@
+trebuchet-trigger (0.5.5-1) precise; urgency=low
+
+  * Update for yaml format args to publish.runner
+
+ -- Ariel T. Glenn <ariel@wikimedia.org>  Sat, 09 May 2015 08:32:56 +0000
+
 trebuchet-trigger (0.5.4-1) precise; urgency=low
 
   * Catch exception for config when not in repo
