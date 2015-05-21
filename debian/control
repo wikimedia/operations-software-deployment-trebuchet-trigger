@@ -8,7 +8,7 @@ XS-Python-Version: current
 
 Package: trebuchet-trigger
 Architecture: all
-Depends: ${misc:Depends}, ${python:Depends}, python-git (>=0.3.2.RC1)
+Depends: ${misc:Depends}, ${python:Depends}, python-git (>=0.3.1)
 XB-Python-Version: ${python:Versions}
 Provides: ${python:Provides}
 Description: An extendable git interface to trebuchet.

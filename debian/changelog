@@ -1,3 +1,9 @@
+trebuchet-trigger (0.5.6-1) trusty; urgency=low
+
+  * Rebuild for trusty, fixed python-git dependency (T95436)
+
+ -- Daniel Zahn <dzahn@wikimedia.org>  Thu, 21 May 2015 20:53:10 +0000
+
 trebuchet-trigger (0.5.5-1) precise; urgency=low
 
   * Update for yaml format args to publish.runner
