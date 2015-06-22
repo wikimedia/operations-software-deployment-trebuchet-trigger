@@ -385,6 +385,19 @@ class ReportDriver(drivers.ReportDriver):
                 ret['pending'][minion] = data
         return ret
 
+    def report_minions(self):
+        serv = self._get_redis_serv()
+        repo_name = self.conf.config['deploy.repo-name']
+        minions = serv.smembers('deploy:{0}:minions'.format(repo_name))
+        LOG.info("")
+        if not len(minions):
+            LOG.info('No known minions for repo {0} yet'.format(repo_name))
+        else:
+            LOG.info('list of known minions for repo {0} ({1} total):'.format(
+                repo_name, len(minions)))
+            for minion in minions:
+                LOG.info(minion)
+
 
 class CleanupDriver(drivers.CleanupDriver):
 

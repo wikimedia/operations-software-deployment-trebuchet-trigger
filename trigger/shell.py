@@ -229,7 +229,7 @@ class Trigger(object):
 
     @utils.arg('action',
                metavar='<action>',
-               help='Service action to take: sync|service')
+               help='Report action to take: minions|sync|service')
     @utils.arg('--detailed',
                dest='detailed',
                action='store_true',
@@ -256,6 +256,13 @@ class Trigger(object):
         except ReportDriverError as e:
             LOG.error(e.message)
             raise TriggerError('The reporter failed.', 210)
+
+        try:
+            if args.action == 'minions':
+                self._report_driver.report_minions()
+        except ReportDriverError as e:
+            LOG.error(e.message)
+            raise TriggerError('The reporter failed.', 213)
 
     @utils.arg('command', metavar='<subcommand>', nargs='?',
                help='Display help for <subcommand>.')
