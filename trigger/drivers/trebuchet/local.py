@@ -26,6 +26,7 @@ from trigger.drivers import SyncDriverError
 from trigger.drivers import LockDriverError
 from trigger.drivers import ServiceDriverError
 from trigger.drivers import ReportDriverError
+from trigger.drivers import CleanupDriverError
 
 LOG = config.LOG
 
@@ -383,3 +384,25 @@ class ReportDriver(drivers.ReportDriver):
             else:
                 ret['pending'][minion] = data
         return ret
+
+
+class CleanupDriver(drivers.CleanupDriver):
+
+    def __init__(self, conf):
+        self.conf = conf
+        self._report_driver = self.conf.drivers['report-driver']
+
+    def cleanup(self, minion):
+        repo_name = self.conf.config['deploy.repo-name']
+        serv = self._report_driver._get_redis_serv()
+        minions = serv.smembers('deploy:{0}:minions'.format(repo_name))
+        if minion not in minions:
+            raise CleanupDriverError("No such minion {0} known in redis for repo".format(
+                minion), 1)
+        else:
+            # remove minion hash, then remove minion from the set
+            minion_key = 'deploy:{0}:minions:{1}'.format(repo_name, minion)
+            serv.delete(minion_key)
+            serv.srem('deploy:{0}:minions'.format(repo_name), minion)
+            LOG.info("removed minion {0} from redis targets for {1}".format(
+                minion, repo_name))

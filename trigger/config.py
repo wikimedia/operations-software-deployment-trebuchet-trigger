@@ -107,6 +107,10 @@ class Configuration(object):
                 'required': True,
                 'default': 'trebuchet.local.ReportDriver'
             },
+            'deploy.cleanup-driver': {
+                'required': True,
+                'default': 'trebuchet.local.CleanupDriver'
+            },
         }
         self._register_config(driver_config)
         for driver in driver_config:

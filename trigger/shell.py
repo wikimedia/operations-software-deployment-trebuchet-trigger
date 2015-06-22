@@ -29,6 +29,7 @@ from trigger.drivers import LockDriverError
 from trigger.drivers import SyncDriverError
 from trigger.drivers import ServiceDriverError
 from trigger.drivers import ReportDriverError
+from trigger.drivers import CleanupDriverError
 from trigger.config import ConfigurationError
 from datetime import datetime
 from git import GitCommandError
@@ -54,6 +55,7 @@ class Trigger(object):
         self._sync_driver = self.conf.drivers['sync-driver']
         self._service_driver = self.conf.drivers['service-driver']
         self._report_driver = self.conf.drivers['report-driver']
+        self._cleanup_driver = self.conf.drivers['cleanup-driver']
 
     def do_start(self, args):
         """
@@ -269,6 +271,22 @@ class Trigger(object):
                 raise TriggerError(msg, 1)
         else:
             self.parser.print_help()
+
+    @utils.arg('minion',
+               metavar='<minion>',
+               help='Minion to remove from redis known minions for this repo')
+    def do_cleanup(self, args):
+        """
+        Clean up dead minions for this repository
+        """
+        if not args.minion:
+            msg = "minion name must be specified as argument"
+            raise TriggerError(msg, 1)
+        else:
+            try:
+                self._cleanup_driver.cleanup(args.minion)
+            except CleanupDriverError as e:
+                LOG.error(e.message)
 
     def _discover_extensions(self):
         extensions = []
